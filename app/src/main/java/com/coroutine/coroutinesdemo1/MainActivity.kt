@@ -5,9 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import com.example.coroutinesdemo1.R
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class MainActivity : AppCompatActivity() {
     private var count = 0
@@ -21,16 +19,32 @@ class MainActivity : AppCompatActivity() {
         }
         btnDownloadUserData.setOnClickListener {
 
-            CoroutineScope(Dispatchers.IO).launch {
-                downloadUserData()
+            CoroutineScope(Dispatchers.Main).launch {
+                //tvUserMessage.text = UserDataManager().getTotalUserCount().toString()
+                tvUserMessage.text = UserDataManager2().getTotalUserCount().toString()
+                 //downloadUserData()
+                Log.i("MyTag", "Downloading user  in ${Thread.currentThread().name}")
+
             }
 
+            CoroutineScope(Dispatchers.IO).launch {
+                // downloadUserData()
+                Log.i("MyTag", "Downloading user  in ${Thread.currentThread().name}")
+            }
+
+
         }
     }
 
-    private fun downloadUserData() {
-        for (i in 1..200000) {
-            Log.i("MyTag", "Downloading user $i in ${Thread.currentThread().name}")
+    private suspend fun downloadUserData() {
+        for (i in 1..2000) {
+            //to switch between threads
+            withContext(Dispatchers.Main){
+                tvUserMessage.text = "Downloading user $i in ${Thread.currentThread().name}"
+            }
+           // Log.i("MyTag", "Downloading user $i in ${Thread.currentThread().name}")
         }
+
     }
 }
+
